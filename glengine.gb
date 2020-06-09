@@ -1,0 +1,635 @@
+'Created By Rabia Alhaffar In 14/April/2020
+'Project Beyond For Basic4GL
+dim next_r = 0
+dim next_g = 0
+dim next_b = 0
+dim tint_r = 0
+dim tint_g = 0
+dim tint_b = 0
+dim camera_z = 1000
+dim angle = 0
+dim tint_to_use = false
+dim use_rgb = false
+dim do_scale = false
+dim do_translate = false
+dim do_rotate = true
+dim tx = 0,ty = 0,tz = -1000
+dim ra = 0,rx = 0,ry = 0,rz = -1000
+dim sx = 0,sy = 0,sz = -1000
+glEnable(GL_BLEND)
+glEnable(GL_DEPTH)
+function set_window_title(t$)
+    SetWindowTitle(t$)
+    return 0
+end function
+
+function set_color_rgb()
+    use_rgb = true
+    return 0
+end function
+
+function set_color(r,g,b)
+    next_r = r
+    next_g = g
+    next_b = b
+    use_rgb = false
+
+    return r
+    return g
+    return b  
+end function
+
+function set_image_tint(r,g,b)
+    tint_r = r
+    tint_g = g
+    tint_b = b
+    tint_to_use = true
+
+    return r
+    return g
+    return b  
+end function
+
+function opengl_string(v)
+    glGetString(v)
+    return v
+end function
+
+function set_lighting(e)
+    if e = true then
+        glEnable(GL_LIGHTING)
+    endif
+    if e = false then
+        glDisable(GL_LIGHTING)
+    endif
+    return e
+end function
+
+function clear_screen()
+    Cls
+    return 0
+end function
+
+function clear_color(r,g,b)
+    glClearColor(r,g,b,1)
+    glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+
+    return r
+    return g
+    return b
+end function
+
+function draw_rect(x,y,w,h,m)
+    'Load Identity For Transform Happened Before Drawing 
+    glLoadidentity()
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    if m = 1 then
+        glBegin(GL_QUADS)
+            if use_rgb then glColor3f(0,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x + w,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x + w,y - h,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - h,-camera_z)
+        glEnd()
+    endif
+    if m = 0 then
+        glBegin(GL_LINE_LOOP)
+            if use_rgb then glColor3f(0,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x + w,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x + w,y - h,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - h,-camera_z)
+        glEnd()
+    endif
+
+    return m
+    return x
+    return y
+    return w
+    return h
+
+end function
+
+function draw_line(x1,y1,x2,y2,s)
+    'Load Identity For Transform Happened Before Drawing 
+    glPointSize(s)
+    glLoadidentity()
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    glBegin(GL_LINES)    
+        if use_rgb then glColor3f(1,0,0) else glColor3f(next_r,next_g,next_b) endif 
+        glVertex3f(x1,y1,-camera_z)
+        if use_rgb then glColor3f(0,1,0) endif
+        glVertex3f(x2,y2,-camera_z)
+        if use_rgb then glColor3f(0,0,1) endif
+    glEnd()
+    glPointSize(1)
+
+    return s
+    return x1
+    return y1
+    return x2
+    return y2
+end function
+
+function draw_triangle(x1,y1,x2,y2,x3,y3,m)
+    'Load Identity For Transform Happened Before Drawing 
+    glLoadidentity()
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    if m = 1 then
+        glBegin(GL_TRIANGLES)
+            if use_rgb then glColor3f(1,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x1,y1,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x2,y2,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x3,y3,-camera_z)
+        glEnd()
+    endif
+    if m = 0 then
+        glBegin(GL_LINE_LOOP)
+            if use_rgb then glColor3f(1,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x1,y1,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x2,y2,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x3,y3,-camera_z)
+        glEnd()
+    endif
+
+    return x1
+    return y1
+    return x2
+    return y2
+    return x3
+    return y3
+    return m
+end function
+
+function draw_circle(x,y,r,m)
+     'Load Identity For Transform Happened Before Drawing 
+     glLoadidentity()
+     if do_translate then glTranslatef(tx,ty,tz) endif
+     if do_rotate then glRotatef(ra,rx,ry,rz) endif
+     if do_scale then glScalef(rx,ry,rz) endif
+     if m = 1 then
+     glBegin(GL_TRIANGLE_FAN)
+         glColor3f(next_r,next_g,next_b)
+         glVertex3f(x,y,-camera_z)
+         for angle = 0 to 360 step 5
+             glVertex3f(x + sind(angle) * r, y + cosd(angle) * r,-camera_z)
+         next
+         glEnd()
+     endif
+     if m = 1 then
+     glBegin(GL_LINE_LOOP)
+         glColor3f(next_r,next_g,next_b)
+         glVertex3f(x,y,-camera_z)
+         for angle = 0 to 360 step 5
+             glVertex3f(x + sind(angle) * r, y + cosd(angle) * r,-camera_z)
+         next
+         glEnd()
+     endif
+
+     return x
+     return y
+     return r
+     return m
+end function
+
+function zoom(z_index)
+    camera_z = camera_z + z_index
+    return z_index
+end function
+
+function render()
+    SwapBuffers()
+    return 0
+end function
+
+
+function translate(x,y,z)
+    do_scale = true 
+    tx = x
+    ty = y
+    if z = 0 then 
+        tz = -camera_z
+    else
+        tz = z
+    endif
+    do_translate = true
+    return x
+    return y
+    return z
+end function
+
+function scale(x,y,z)
+    sx = x
+    sy = y
+    if z = 0 then
+        sz = -camera_z
+    else
+        sz = z
+    endif
+    do_scale = true
+    return x
+    return y
+    return z
+end function
+
+function rotate(a,x,y,z)
+    ra = a
+    rx = x
+    ry = y
+    if z = 0 then rz = -camera_z else rz = z endif
+    do_rotate = true
+    return a
+    return x
+    return y
+    return z
+end function
+
+function text(txt$,x,y,r,g,b)
+    locate x,y
+    Color(r,g,b)
+    TextMode(TEXT_OVERLAID)
+    drawtext(DRAW_TEXT or DRAW_SPRITES)
+    printr(txt$)
+    return x
+    return y
+    return r
+    return g
+    return b
+end function
+
+function set_fps(f)
+    WaitTimer(1000 / f)
+    return f
+end function
+
+function load_font(f,t$)
+    f = LoadTex(t$)
+    Font(f)
+    return f
+end function
+
+function reset_font()
+    Font(DefaultFont())
+    return 0
+end function
+
+function key_down(k$)
+    return KeyDown(k$)
+end function
+
+function scankey_down(k)
+    return ScanKeyDown(k)
+end function
+
+function debug_log(msg$)
+    printr(msg$)
+    return 0
+end function
+
+function mouse_down(b)
+    return Mouse_Button(b)
+end function
+
+function gamepad_button_pressed(gb)
+    return Joy_Button(gb)
+end function
+
+function gamepad_up_pressed()
+    return Joy_Up()
+end function
+
+function gamepad_down_pressed()
+    return Joy_Down()
+end function
+
+function gamepad_left_pressed()
+    return Joy_Left()
+end function
+
+function gamepad_right_pressed()
+    return Joy_Right()
+end function
+
+function load_sound(s$)
+    return LoadSound(s$)
+end function
+
+function play_sound(s,v,l)
+    PlaySound(s,v,l)
+    return v
+    return l
+end function
+
+function play_music(s$,v,l)
+    PlayMusic(s$,v,l)
+    return v
+    return l
+end function
+
+function pause_audio()
+    StopSounds()
+    if MusicPlaying() then StopMusic() endif
+    return 0
+end function
+
+function fullscreen_mode(f)
+    SetWindowFullscreen(f)
+    UpdateWindow()    
+    return f
+end function
+
+function resize_window(w,h)
+    SetWindowWidth(w)
+    SetWindowHeight(h)
+    UpdateWindow()
+    return w
+    return h
+end function
+
+function clear_rect(x,y,w,h)
+    glEnable(GL_SCISSOR_TEST)
+    glScissor(x,y,w,h)
+    glClear(GL_COLOR_BUFFER_BIT)
+    glDisable(GL_SCISSOR_TEST)
+    
+    return x
+    return y
+    return w
+    return h
+end function
+
+function cut(x,y,w,h)
+    glEnable(GL_SCISSOR_TEST)
+    glScissor(x,y,w,h)
+
+    return x
+    return y
+    return w
+    return h
+end function
+
+function save_content()
+    glPushMatrix()
+    return 0
+end function
+
+function restore_content()
+    glPopMatrix()
+    return 0
+end function
+
+'You Need SOIL If You Want To Use This Function In FreeBASIC Edition Of Project Beyond
+'http://www.lonesock.net/soil.html
+'https://www.freebasic.net/forum/viewtopic.php?t=10217
+function draw_texture(t,x,y,w,h,r)
+    glLoadIdentity()
+    glEnable(GL_TEXTURE_2D)
+    glGentexture()
+    glBindTexture(GL_TEXTURE_2D,t)
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,w,h,GL_UNSIGNED_BYTE,GL_RGB,0,t)
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR) 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_CLAMP)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP)
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+    if tint_to_use then
+        glColor3f(tint_r,tint_g,tint_b)
+    else
+        glColor3f(255,255,255)
+    endif
+    glRotatef(r,0,0,-1000)
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    glBegin(GL_QUADS)
+        glTexCoord2d(0,0)
+        glVertex3f(x,y,-camera_z)
+        glTexCoord2d(1,0)
+        glVertex3f(x + w,y,-camera_z)
+        glTexCoord2d(1,1)
+        glVertex3f(x + w,y - h,-camera_z)
+        glTexCoord2d(0,1)
+        glVertex3f(x,y - h,-camera_z)
+    glEnd()
+    glDisable(GL_TEXTURE_2D)
+    glDeleteTexture(t) 'Automatically Free/Unload Image From Memory
+
+    return t
+    return x
+    return y
+    return w
+    return h
+end function
+
+function collision_rect(r1_x,r1_y,r1_w,r1_h,r2_x,r2_y,r2_w,r2_h)
+    return r1_x < r2_x + r2_w and r1_x + r1_w > r2_x and r1_y < r2_y + r2_h and r1_y + r1_h > r2_y
+end function
+
+function collision_circle(c1_x,c1_y,c1_r,c2_x,c2_y,c2_r)
+    return sqrt (c1_x - c2_x * c1_x - c2_x) + (c1_y + c2_y * c1_y + c2_y) < c1_r + c2_r
+end function
+	  
+function collision_circle_rect(c1_x,c1_y,c1_r,r1_x,r1_y,r1_w,r1_h)
+    if (abs(c1_x - r1_x - r1_w / 2) > (r1_w / 2 + c1_r) or abs(c1_y - r1_y - r1_h / 2) > (r1_h / 2 + c1_r)) then return false endif
+    if (abs(c1_x - r1_x - r1_w / 2) <= (r1_w / 2) or abs(c1_y - r1_y - r1_h / 2) <= (r1_h / 2)) then return true endif
+    return (abs(c1_x - r1_x - r1_w / 2) - r1_w / 2 * abs(c1_x - r1_x - r1_w / 2) - r1_w / 2 + abs(c1_y - r1_y - r1_h / 2) - r1_h / 2 * abs(c1_y - r1_y - r1_h / 2) - r1_h / 2 <= (c1_r * c1_r))  
+end function
+
+function collision_rect_left_screen(rx,rw)
+    return rx <= rw * 0.5
+end function
+
+function collision_rect_right_screen(rx,rw)
+    return rx + rw >= WindowWidth() + rw * 0.5
+end function
+
+function collision_rect_top_screen(ry,rh)
+    return ry <= rh * 0.5
+end function
+
+function collision_rect_bottom_screen(ry,rh)
+    return ry + rh >= WindowHeight() + rh * 0.5
+end function
+
+function collision_circle_top_screen(cy,cvy,cr)
+    return cy + cvy < cr
+end function
+
+function collision_circle_bottom_screen(cy,cvy,cr)
+    return cy + cvy > WindowHeight() - cr
+end function
+
+function collision_circle_left_screen(cx,cvx,cr)
+    return cx + cvx < cr
+end function
+
+function collision_circle_right_screen(cx,cvx,cr)
+    return cx + cvx > WindowWidth() - cr
+end function
+
+'3D Shapes(Cube,Pyramid,Cubemap,3D Lines)
+function draw_line3d(x1,y1,z1,x2,y2,z2,s)
+    'Load Identity For Transform Happened Before Drawing 
+    glPointSize(s)
+    glLoadidentity()
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    glBegin(GL_LINES)    
+        if use_rgb then glColor3f(1,0,0) else glColor3f(next_r,next_g,next_b) endif 
+        glVertex3f(x1,y1,z1)
+        if use_rgb then glColor3f(0,1,0) endif
+        glVertex3f(x2,y2,z2)
+        if use_rgb then glColor3f(0,0,1) endif
+    glEnd()
+    glPointSize(1)
+    return x1
+    return y1
+    return z1
+    return x2
+    return y2
+    return z2
+    return s
+end function
+
+function draw_cube(x,y,z,s,m)
+    glLoadIdentity()
+    if do_translate then glTranslatef(tx,ty,tz) endif
+    if do_rotate then glRotatef(ra,rx,ry,rz) endif
+    if do_scale then glScalef(rx,ry,rz) endif
+    if m = 1 then
+        glBegin(GL_QUADS)
+            if use_rgb then glColor3f(0,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y,-camera_z + s)
+ 
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y - s,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x - s,y - s,-camera_z)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - s,-camera_z + s)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y - s,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y,-camera_z)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x,y,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - s,-camera_z)
+        glEnd()
+    endif
+    if m = 0 then
+        glBegin(GL_LINES)
+            if use_rgb then glColor3f(0,0,0) else glColor3f(next_r,next_g,next_b) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y,-camera_z + s)
+ 
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y - s,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x - s,y - s,-camera_z)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - s,-camera_z + s)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y - s,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y,-camera_z)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x - s,y,-camera_z + s)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x - s,y,-camera_z)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x - s,y - s,-camera_z)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x - s,y - s,-camera_z + s)
+
+            if use_rgb then glColor3f(0,0,0) endif
+            glVertex3f(x,y,-camera_z)
+            if use_rgb then glColor3f(1,0,0) endif
+            glVertex3f(x,y,-camera_z + s)
+            if use_rgb then glColor3f(0,1,0) endif
+            glVertex3f(x,y - s,-camera_z + s)
+            if use_rgb then glColor3f(0,0,1) endif
+            glVertex3f(x,y - s,-camera_z)
+        glEnd()
+    endif
+    return x
+    return y
+    return z
+    return s
+    return m
+end function
